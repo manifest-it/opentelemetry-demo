@@ -22,8 +22,9 @@ RUN npm run build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
-RUN apk add --no-cache protobuf-dev protoc
+RUN apk add --no-cache protobuf-dev protoc python3 py3-pip
 
+COPY /src/frontend/oom.py /app/oom.py
 ENV NODE_ENV=production
 
 RUN addgroup -g 1001 -S nodejs
@@ -38,10 +39,14 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Copy the start script to run both processes
+COPY ./src/frontend/start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 USER nextjs
 
-ENV PORT=8080
+ENV PORT 8080
 EXPOSE ${PORT}
 
-ENTRYPOINT ["npm", "start"]
-
+# Use the start script as the entry point
+ENTRYPOINT ["./start.sh"]

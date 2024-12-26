@@ -19,7 +19,7 @@ const {
   IS_SYNTHETIC_REQUEST = '',
 } = typeof window !== 'undefined' ? window.ENV : {};
 
-const FrontendTracer = () => {
+const FrontendTracer = (collectorString: string) => {
   let resource = new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: NEXT_PUBLIC_OTEL_SERVICE_NAME,
   });
@@ -33,7 +33,7 @@ const FrontendTracer = () => {
   provider.addSpanProcessor(
     new BatchSpanProcessor(
       new OTLPTraceExporter({
-        url: NEXT_PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT || 'http://localhost:4318/v1/traces',
+        url: NEXT_PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT || collectorString || 'http://localhost:4318/v1/traces',
       }),
       {
         scheduledDelayMillis: 500,

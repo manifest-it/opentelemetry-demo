@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:495462907305:certificate/86cd2229-81e3-47b2-9dbc-55640adbac2f
+    alb.ingress.kubernetes.io/group.name: mit-apps
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "120"
+    alb.ingress.kubernetes.io/ip-address-type: ipv4
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/security-groups: sg-01046952fa9885eb6
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/subnets: subnet-07a81590d1eb5f852,subnet-0cdba8e0709798c63
+    alb.ingress.kubernetes.io/tags: Name=mit-apps,owner_email=sudheer@manifestit.io,terraform=false
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/wafv2-acl-arn: arn:aws:wafv2:us-west-2:495462907305:regional/webacl/apps-acme-waf/4e5aab98-24fa-4471-bcaa-0148d2f1bc44
+  name: demo-ingress
+  namespace: otel-demo
+spec:
+  ingressClassName: alb
+  rules:
+  - host: demo.manifestit.tech
+    http:
+      paths:
+      - backend:
+          service:
+            name: opentelemetry-demo-frontendproxy
+            port:
+              number: 8080
+        path: /*
+        pathType: ImplementationSpecific

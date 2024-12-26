@@ -240,6 +240,7 @@ func (p *productCatalog) ListProducts(ctx context.Context, req *pb.Empty) (*pb.L
 
 	span.SetAttributes(
 		attribute.Int("app.products.count", len(catalog)),
+		attribute.Bool("__manifest__", true),
 	)
 	return &pb.ListProductsResponse{Products: catalog}, nil
 }
@@ -248,6 +249,7 @@ func (p *productCatalog) GetProduct(ctx context.Context, req *pb.GetProductReque
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(
 		attribute.String("app.product.id", req.Id),
+		attribute.Bool("__manifest__", true),
 	)
 
 	// GetProduct will fail on a specific product when feature flag is enabled
@@ -293,14 +295,15 @@ func (p *productCatalog) SearchProducts(ctx context.Context, req *pb.SearchProdu
 	}
 	span.SetAttributes(
 		attribute.Int("app.products_search.count", len(result)),
+		attribute.Bool("__manifest__", true),
 	)
 	return &pb.SearchProductsResponse{Results: result}, nil
 }
 
 func (p *productCatalog) checkProductFailure(ctx context.Context, id string) bool {
-	if id != "OLJCESPC7Z" {
-		return false
-	}
+	// if id != "OLJCESPC7Z" {
+	// 	return false
+	// }
 
 	client := openfeature.NewClient("productCatalog")
 	failureEnabled, _ := client.BooleanValue(
